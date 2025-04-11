@@ -176,3 +176,5 @@ cython_debug/
 
 # Misc
 *.DS_Store
+.notebooks/
+*.pth
