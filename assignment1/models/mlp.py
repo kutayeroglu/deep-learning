@@ -33,7 +33,7 @@ class MLP:
             hidden_layers.append(ReLU())
             prev_dim = dim
 
-        # Output layer (no activation as we'll apply softmax in predict method, separating forward and probability logic)
+        # Output layer: produces raw logits; softmax will be applied in the loss function
         self.output_layer = Linear(prev_dim, output_dim)
 
         # Combine all hidden layers into a sequential module
