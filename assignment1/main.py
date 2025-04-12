@@ -18,6 +18,7 @@ if ASSIGNMENT_DIR not in sys.path:
 
 # Import custom modules
 from data.data_loader import load_quickdraw_data
+from models.mlp import MLP
 
 
 def parse_args():
@@ -104,6 +105,15 @@ def main():
         args.data_dir, args.batch_size, args.val_split, args.seed
     )
     print(f"Number of classes: {num_classes}")
+
+    # Create model
+    print("Creating model...")
+    model = MLP(
+        input_dim=784,  # 28x28 images
+        hidden_dims=args.hidden_dims,
+        output_dim=num_classes,
+    )
+    print(model)
 
 
 if __name__ == "__main__":
