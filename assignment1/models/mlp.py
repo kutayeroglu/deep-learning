@@ -40,7 +40,63 @@ class MLP:
         self.hidden_layers = Sequential(*hidden_layers)
 
     def forward(self, x):
-        raise NotImplementedError("Forward pass logic not implemented yet.")
+        """
+        Forward pass through the network.
+
+        Args:
+            x (numpy.ndarray): Input data, shape (batch_size, input_dim) or (batch_size, height, width)
+
+        Returns:
+            numpy.ndarray: Output logits, shape (batch_size, output_dim)
+        """
+        # Ensure the input is 2D (batch_size, input_dim)
+        if x.ndim > 2:
+            batch_size = x.shape[0]
+            x = x.reshape(batch_size, -1)
+
+        # Pass through hidden layers
+        hidden_output = self.hidden_layers.forward(x)
+
+        # Pass through output layer
+        output = self.output_layer.forward(hidden_output)
+
+        return output
 
     def predict(self, x):
-        raise NotImplementedError("Prediction logic not implemented yet.")
+        """
+        Predict class labels for input data.
+
+        Args:
+            x (numpy.ndarray): Input data, shape (batch_size, input_dim) or (batch_size, height, width)
+
+        Returns:
+            numpy.ndarray: Predicted class indices, shape (batch_size,)
+        """
+        # Forward pass to get logits
+        logits = self.forward(x)
+
+        # Get the class with highest logit (argmax)
+        predictions = np.argmax(logits, axis=1)
+
+        return predictions
+
+    def parameters(self):
+        """
+        Get all trainable parameters of the model.
+
+        Returns:
+            list: List of parameter arrays
+        """
+        params = []
+
+        # Add parameters from hidden layers that have weights and biases
+        for layer in self.hidden_layers.layers:
+            if hasattr(layer, "weights"):
+                params.append(layer.weights)
+                params.append(layer.bias)
+
+        # Add parameters from the output layer
+        params.append(self.output_layer.weights)
+        params.append(self.output_layer.bias)
+
+        return params
