@@ -175,6 +175,8 @@ cython_debug/
 *.png
 glove*.zip
 *.pth
+*.txt
+*.npz
 
 # Misc
 *.DS_Store
