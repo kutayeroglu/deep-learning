@@ -7,6 +7,10 @@ import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
+from utils.visualization import (
+    plot_roc_pr_curves,
+    plot_training_history,
+)
 
 # Get the absolute path of the script's directory
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -155,13 +159,18 @@ def main():
     # Print metrics
     print("\nTest Metrics:")
     for name, value in metrics.items():
-        print(f"{name}: {value:.4f}")
+        if isinstance(value, (float, int, np.number)):
+            print(f"{name}: {value:.4f}")
 
     # Plot and save training history
-    fig, _ = trainer.plot_training_history(history)
+    fig, _ = plot_training_history(history)
     history_path = os.path.join(save_dir, "training_history.png")
     fig.savefig(history_path)
     print(f"Training history saved to {history_path}")
+
+
+    # Plot and save ROC and PR curves
+    plot_roc_pr_curves(metrics, save_dir)
 
     # Save model
     model_path = os.path.join(save_dir, "model.pth")
@@ -173,7 +182,8 @@ def main():
     with open(metrics_path, "w") as f:
         f.write("Test Metrics:\n")
         for name, value in metrics.items():
-            f.write(f"{name}: {value:.4f}\n")
+            if isinstance(value, (float, int, np.number)):
+                f.write(f"{name}: {value:.4f}\n")
 
         f.write("\nModel Architecture:\n")
         f.write(str(model))

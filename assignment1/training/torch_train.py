@@ -162,8 +162,8 @@ class Trainer:
         history = {
             "train_loss": self.train_losses,
             "val_loss": self.val_losses,
-            "train_accuracy": self.train_accuracies,
-            "val_accuracy": self.val_accuracies,
+            "train_acc": self.train_accuracies,
+            "val_acc": self.val_accuracies,
             "training_time": training_time,
         }
 
@@ -273,20 +273,33 @@ class Trainer:
         )
         recall = recall_score(true_labels, preds, average="weighted", zero_division=0)
 
+        # Store ROC curve data for each class
+        from sklearn.metrics import roc_curve
+
         # Calculate ROC AUC
         roc_auc = roc_auc_score(true_one_hot, probs, multi_class="ovr")
+        
+        roc_curves = []
+        roc_aucs = []
+        for i in range(n_classes):
+            fpr, tpr, _ = roc_curve(true_one_hot[:, i], probs[:, i])
+            class_auc = auc(fpr, tpr)
+            roc_aucs.append(class_auc)
+            roc_curves.append((fpr, tpr, i))
 
-        # Calculate Precision-Recall AUC for each class
-        pr_auc_scores = []
+        # Calculate Precision-Recall AUC and collect PR curve data
+        pr_aucs = []
+        pr_curves = []
         for i in range(n_classes):
             precision_curve, recall_curve, _ = precision_recall_curve(
                 true_one_hot[:, i], probs[:, i]
             )
-            pr_auc = auc(recall_curve, precision_curve)
-            pr_auc_scores.append(pr_auc)
+            class_pr_auc = auc(recall_curve, precision_curve)
+            pr_aucs.append(class_pr_auc)
+            pr_curves.append((precision_curve, recall_curve, i))
 
         # Average PR AUC across all classes
-        pr_auc = np.mean(pr_auc_scores)
+        pr_auc = np.mean(pr_aucs)
 
         # Compile results
         metrics = {
@@ -295,6 +308,10 @@ class Trainer:
             "recall": recall,
             "roc_auc": roc_auc,
             "pr_auc": pr_auc,
+            "roc_curves": roc_curves,
+            "pr_curves": pr_curves,
+            "roc_aucs": roc_aucs,
+            "pr_aucs": pr_aucs,
         }
 
         return metrics
