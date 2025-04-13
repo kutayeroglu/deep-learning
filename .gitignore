@@ -173,9 +173,9 @@ cython_debug/
 # Data
 *.npy
 *.png
+glove*.zip
+*.pth
 
 # Misc
 *.DS_Store
 .notebooks/
-*.pth
-glove.6B.*
