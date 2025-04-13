@@ -137,6 +137,9 @@ def parse_args():
         help="Directory to save results",
     )
     parser.add_argument("--no_cuda", action="store_true", help="Disable CUDA training")
+    parser.add_argument(
+        "--margin", type=int, default=0.2, help="MArgin for MultiMargin Loss"
+    )
 
     return parser.parse_args()
 
@@ -218,7 +221,7 @@ def main():
 
     # Train the model
     print("Training model...")
-    criterion = ContrastiveLoss()
+    criterion = nn.MultiMarginLoss(margin=args.margin)
     history = trainer.train(
         train_loader,
         val_loader,

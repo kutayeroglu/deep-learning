@@ -123,7 +123,11 @@ class Trainer:
                 all_word_embs = F.normalize(all_word_embs, p=2, dim=1)
 
                 # loss = criterion(outputs, labels)
-                loss = criterion(image_embs, all_word_embs, labels)
+                # loss = criterion(image_embs, all_word_embs, labels)
+                # Compute similarities 
+                similarities = image_embs @ all_word_embs.T
+                
+                loss = criterion(similarities, labels)
 
                 # Backward pass and optimize
                 loss.backward()
@@ -220,7 +224,11 @@ class Trainer:
                 all_word_embs = F.normalize(all_word_embs, p=2, dim=1)
 
                 # loss = criterion(outputs, labels)
-                loss = criterion(image_embs, all_word_embs, labels)
+                # loss = criterion(image_embs, all_word_embs, labels)
+                # Compute similarities 
+                similarities = image_embs @ all_word_embs.T
+                
+                loss = criterion(similarities, labels)
 
 
                 # Track loss and predictions
