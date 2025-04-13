@@ -1,4 +1,5 @@
 import numpy as np
+from training.optimizers import Parameter
 
 
 class Layer:
@@ -20,11 +21,17 @@ class Linear(Layer):
         Source: https://arxiv.org/abs/1502.01852
         """
         # Initialize weights with He initialization
-        self.weights = np.random.randn(input_dim, output_dim) * np.sqrt(2.0 / input_dim)
-        self.bias = np.zeros(output_dim)
+        weights_array = np.random.randn(input_dim, output_dim) * np.sqrt(
+            2.0 / input_dim
+        )
+        bias_array = np.zeros(output_dim)
+
+        # Wrap arrays in Parameter objects
+        self.weights = Parameter(weights_array)
+        self.bias = Parameter(bias_array)
 
     def forward(self, inputs):
-        return np.dot(inputs, self.weights) + self.bias
+        return np.dot(inputs, self.weights.value) + self.bias.value
 
 
 class ReLU(Layer):
@@ -41,6 +48,25 @@ class Sequential:
         self.layers = list(layers) if layers else []
 
     def forward(self, inputs):
+        """Forward pass through all layers"""
         for layer in self.layers:
             inputs = layer.forward(inputs)
+        return inputs
+
+    def forward_through(self, inputs, start_idx=0, end_idx=None):
+        """Forward pass through a specific subset of layers
+
+        Args:
+            inputs: Input tensor
+            start_idx: Starting layer index (inclusive)
+            end_idx: Ending layer index (exclusive)
+
+        Returns:
+            Output tensor after passing through the specified layers
+        """
+        if end_idx is None:
+            end_idx = len(self.layers)
+
+        for i in range(start_idx, end_idx):
+            inputs = self.layers[i].forward(inputs)
         return inputs
