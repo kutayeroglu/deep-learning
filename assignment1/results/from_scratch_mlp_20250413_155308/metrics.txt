@@ -1,0 +1,20 @@
+Test Metrics:
+accuracy: 0.8322
+precision: 0.8359
+recall: 0.8322
+roc_auc: 0.9684
+pr_auc: 0.9114
+
+Model Architecture:
+<models.mlp.MLP object at 0x11f83b640>
+Training Parameters:
+data_dir: /Users/kutayeroglu/Projects/deep-learning/assignment1/data/quickdraw_subset_np
+batch_size: 64
+val_split: 0.1
+hidden_dims: [128, 64]
+lr: 0.01
+momentum: 0.9
+epochs: 20
+patience: 5
+seed: 42
+save_dir: /Users/kutayeroglu/Projects/deep-learning/assignment1/results

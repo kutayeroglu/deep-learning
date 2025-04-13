@@ -1,9 +1,9 @@
 import os
 import sys
 import argparse
-import numpy as np
 from datetime import datetime
-import matplotlib.pyplot as plt
+
+import numpy as np
 
 # Get the absolute path of the script's directory
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -23,6 +23,10 @@ from models.mlp import MLP
 from training.train import Trainer
 from utils.loss_functions import cross_entropy_loss
 from training.optimizers import SGDMomentum
+from utils.visualization import (
+    plot_roc_pr_curves,
+    plot_training_history,
+)
 
 
 def parse_args():
@@ -146,13 +150,17 @@ def main():
     # Print metrics
     print("\nTest Metrics:")
     for name, value in metrics.items():
-        print(f"{name}: {value:.4f}")
+        if isinstance(value, (float, int, np.number)):
+            print(f"{name}: {value:.4f}")
 
     # Plot and save training history
     fig, ax = plot_training_history(history)
     history_path = os.path.join(save_dir, "training_history.png")
     fig.savefig(history_path)
     print(f"Training history saved to {history_path}")
+
+    # Plot and save ROC and PR curves
+    plot_roc_pr_curves(metrics, save_dir)
 
     # Save model
     model_path = os.path.join(save_dir, "model.npz")
@@ -164,7 +172,8 @@ def main():
     with open(metrics_path, "w") as f:
         f.write("Test Metrics:\n")
         for name, value in metrics.items():
-            f.write(f"{name}: {value:.4f}\n")
+            if isinstance(value, (float, int, np.number)):
+                f.write(f"{name}: {value:.4f}\n")
 
         f.write("\nModel Architecture:\n")
         f.write(str(model))
@@ -174,74 +183,6 @@ def main():
             f.write(f"{arg}: {value}\n")
 
     print(f"Metrics saved to {metrics_path}")
-
-    # Plot a sample of test images with predictions
-    print("Generating sample predictions...")
-    plot_sample_predictions(test_loader, model, save_dir)
-
-    print("Done!")
-
-
-def plot_training_history(history):
-    """Plot training history."""
-    fig, ax = plt.subplots(1, 2, figsize=(12, 4))
-
-    # Plot loss
-    ax[0].plot(history["train_loss"], label="Train")
-    ax[0].plot(history["val_loss"], label="Validation")
-    ax[0].set_title("Loss")
-    ax[0].set_xlabel("Epoch")
-    ax[0].set_ylabel("Loss")
-    ax[0].legend()
-
-    # Plot accuracy
-    ax[1].plot(history["train_acc"], label="Train")
-    ax[1].plot(history["val_acc"], label="Validation")
-    ax[1].set_title("Accuracy")
-    ax[1].set_xlabel("Epoch")
-    ax[1].set_ylabel("Accuracy")
-    ax[1].legend()
-
-    plt.tight_layout()
-    return fig, ax
-
-
-def plot_sample_predictions(test_loader, model, save_dir, num_samples=5):
-    """Plot a sample of test images with predictions."""
-    # Get a batch of images
-    for images, labels in test_loader:
-        break  # Just get the first batch
-
-    # Select a subset of images
-    images = images[:num_samples]
-    labels = labels[:num_samples]
-
-    # Get predictions
-    outputs = model.forward(images)
-    probs = model.softmax(outputs)
-    preds = np.argmax(probs, axis=1)
-
-    # Plot images
-    fig, axes = plt.subplots(1, num_samples, figsize=(15, 3))
-    for i in range(num_samples):
-        # Reshape the image
-        img = images[i].reshape(28, 28)
-
-        # Plot the image
-        axes[i].imshow(img, cmap="gray")
-        axes[i].set_title(
-            f"True: {labels[i]}\nPred: {preds[i]}\nProb: {probs[i, preds[i]]:.2f}"
-        )
-        axes[i].axis("off")
-
-    plt.tight_layout()
-
-    # Save the plot
-    plot_path = os.path.join(save_dir, "sample_predictions.png")
-    plt.savefig(plot_path)
-    plt.close()
-
-    print(f"Sample predictions saved to {plot_path}")
 
 
 if __name__ == "__main__":
