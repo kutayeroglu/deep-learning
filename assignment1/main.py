@@ -128,10 +128,11 @@ def main():
     )
 
     # Train the model
+    print("Training model...")
     history = trainer.train(
         train_loader,
         val_loader,
-        loss_fn=cross_entropy_loss,
+        criterion=cross_entropy_loss,
         optimizer=optimizer,
         num_epochs=args.epochs,
         patience=args.patience,
