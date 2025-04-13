@@ -178,3 +178,4 @@ cython_debug/
 *.DS_Store
 .notebooks/
 *.pth
+glove.6B.*
