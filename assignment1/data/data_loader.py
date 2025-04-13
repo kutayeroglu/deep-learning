@@ -77,6 +77,43 @@ class DataLoader:
         """Return the number of batches."""
         return self.num_batches
 
+    def __iter__(self):
+        """Return the iterator object (self)."""
+        # Reset current batch index
+        self.current_batch = 0
+
+        # Shuffle indices if needed
+        if self.shuffle:
+            self.rng.shuffle(self.indices)
+
+        return self
+
+    def __next__(self):
+        """Get the next batch."""
+        if self.current_batch >= self.num_batches:
+            # End of iteration
+            raise StopIteration
+
+        # Get the indices for the current batch
+        start_idx = self.current_batch * self.batch_size
+        end_idx = min((self.current_batch + 1) * self.batch_size, len(self.dataset))
+        batch_indices = self.indices[start_idx:end_idx]
+
+        # Increment batch counter
+        self.current_batch += 1
+
+        # Collect data for this batch
+        batch_images = []
+        batch_labels = []
+
+        for idx in batch_indices:
+            image, label = self.dataset[idx]
+            batch_images.append(image)
+            batch_labels.append(label)
+
+        # Stack arrays into batches
+        return np.array(batch_images), np.array(batch_labels)
+
 
 def load_quickdraw_data(data_dir, batch_size=64, validation_split=0.1, seed=42):
     """

@@ -85,7 +85,7 @@ class MLP:
         Get all trainable parameters of the model.
 
         Returns:
-            list: List of parameter arrays
+            list: List of parameter objects
         """
         params = []
 
@@ -100,3 +100,45 @@ class MLP:
         params.append(self.output_layer.bias)
 
         return params
+
+    def save(self, path):
+        """
+        Save model parameters to a file.
+
+        Args:
+            path (str): Path to save the model
+        """
+        # Create a dictionary to store all weights and biases
+        params_dict = {}
+
+        # Save hidden layer parameters
+        for i, layer in enumerate(self.hidden_layers.layers):
+            if hasattr(layer, "weights"):
+                params_dict[f"hidden_layer_{i}_weights"] = layer.weights.value
+                params_dict[f"hidden_layer_{i}_bias"] = layer.bias.value
+
+        # Save output layer parameters
+        params_dict["output_layer_weights"] = self.output_layer.weights.value
+        params_dict["output_layer_bias"] = self.output_layer.bias.value
+
+        # Save to file
+        np.savez(path, **params_dict)
+
+    # def load(self, path):
+    #     """
+    #     Load model parameters from a file.
+
+    #     Args:
+    #         path (str): Path to load the model from
+    #     """
+    #     params = np.load(path)
+
+    #     # Load hidden layer parameters
+    #     for i, layer in enumerate(self.hidden_layers.layers):
+    #         if hasattr(layer, "weights"):
+    #             layer.weights.value = params[f"hidden_layer_{i}_weights"]
+    #             layer.bias.value = params[f"hidden_layer_{i}_bias"]
+
+    #     # Load output layer parameters
+    #     self.output_layer.weights.value = params["output_layer_weights"]
+    #     self.output_layer.bias.value = params["output_layer_bias"]

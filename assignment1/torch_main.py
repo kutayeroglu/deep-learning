@@ -158,7 +158,7 @@ def main():
         print(f"{name}: {value:.4f}")
 
     # Plot and save training history
-    fig, _ = trainer.plot_training_history()
+    fig, _ = trainer.plot_training_history(history)
     history_path = os.path.join(save_dir, "training_history.png")
     fig.savefig(history_path)
     print(f"Training history saved to {history_path}")
