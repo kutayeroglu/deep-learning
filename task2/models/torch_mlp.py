@@ -7,7 +7,6 @@ class TorchMLP(nn.Module):
     """
     PyTorch implementation of a Multi-Layer Perceptron for image classification.
     Input: 784-dimensional vector (flattened 28x28 images)
-    Output: 5-dimensional vector (class probabilities)
     """
 
     def __init__(
@@ -22,7 +21,6 @@ class TorchMLP(nn.Module):
         Args:
             input_dim (int): Dimension of input features (default: 784 for 28x28 images)
             hidden_dims (list): List of hidden layer dimensions
-            output_dim (int): Number of output classes (default: 5)
         """
         super().__init__()
 
