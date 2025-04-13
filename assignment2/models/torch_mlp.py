@@ -80,19 +80,17 @@ class TorchMLP(nn.Module):
         return probabilities
 
 
-    
-# Joint Model
 class JointModel(nn.Module):
     def __init__(self, image_mlp, word_mlp, category_glove):
         super().__init__()
         self.image_mlp = image_mlp
         self.word_mlp = word_mlp
         self.category_glove = category_glove  # Shape: (num_categories, glove_dim)
-    
+
     def forward(self, images, labels=None):
         image_embs = self.image_mlp(images)
         image_embs = F.normalize(image_embs, p=2, dim=1)
-        
+
         if labels is not None:
             # Training mode
             batch_glove = self.category_glove[labels]  # Get GloVe for batch labels

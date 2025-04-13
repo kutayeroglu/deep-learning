@@ -17,7 +17,6 @@ from sklearn.metrics import (
 )
 
 
-
 class Trainer:
     """
     Trainer class for PyTorch models.
@@ -117,16 +116,16 @@ class Trainer:
                 # Forward pass: get image embeddings
                 image_embs = self.model.image_mlp(inputs)
                 image_embs = F.normalize(image_embs, p=2, dim=1)
-                
+
                 # Compute the word embeddings for all categories
                 all_word_embs = self.model.word_mlp(self.model.category_glove)
                 all_word_embs = F.normalize(all_word_embs, p=2, dim=1)
 
                 # loss = criterion(outputs, labels)
                 # loss = criterion(image_embs, all_word_embs, labels)
-                # Compute similarities 
+                # Compute similarities
                 similarities = image_embs @ all_word_embs.T
-                
+
                 loss = criterion(similarities, labels)
 
                 # Backward pass and optimize
@@ -218,18 +217,17 @@ class Trainer:
                 # Forward pass: get image embeddings
                 image_embs = self.model.image_mlp(inputs)
                 image_embs = F.normalize(image_embs, p=2, dim=1)
-                
+
                 # Compute the word embeddings for all categories
                 all_word_embs = self.model.word_mlp(self.model.category_glove)
                 all_word_embs = F.normalize(all_word_embs, p=2, dim=1)
 
                 # loss = criterion(outputs, labels)
                 # loss = criterion(image_embs, all_word_embs, labels)
-                # Compute similarities 
+                # Compute similarities
                 similarities = image_embs @ all_word_embs.T
-                
-                loss = criterion(similarities, labels)
 
+                loss = criterion(similarities, labels)
 
                 # Track loss and predictions
                 eval_loss += loss.item() * inputs.size(0)
