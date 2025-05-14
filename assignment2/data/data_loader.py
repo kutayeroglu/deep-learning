@@ -50,10 +50,6 @@ class QuickDrawDataset(Dataset):
         )
         label_tensor = torch.tensor(label, dtype=torch.long)
 
-        # Flatten the image if it's not already flattened
-        if image_tensor.dim() > 1:
-            image_tensor = image_tensor.view(-1)
-
         return image_tensor, label_tensor
 
 
