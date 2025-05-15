@@ -28,7 +28,6 @@ from models.gru_autoencoder import GRUAutoencoder
 
 from training.train import Trainer
 from utils.visualization import (
-    plot_roc_pr_curves,
     plot_training_history,
 )
 
@@ -73,15 +72,15 @@ def parse_args():
         help="Number of stacked GRU layers",
     )
 
-    # # Training parameters
-    # parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
-    # parser.add_argument("--momentum", type=float, default=0.9, help="Momentum for SGD")
-    # parser.add_argument(
-    #     "--epochs", type=int, default=20, help="Number of epochs to train"
-    # )
-    # parser.add_argument(
-    #     "--patience", type=int, default=5, help="Patience for early stopping"
-    # )
+    # Training parameters
+    parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
+    parser.add_argument("--momentum", type=float, default=0.9, help="Momentum for SGD")
+    parser.add_argument(
+        "--epochs", type=int, default=20, help="Number of epochs to train"
+    )
+    parser.add_argument(
+        "--patience", type=int, default=5, help="Patience for early stopping"
+    )
 
     # Other parameters
     parser.add_argument(
@@ -143,24 +142,32 @@ def main():
     )
     print(model)
 
-    # # Set up trainer
-    # trainer = Trainer(model, device)
+    # Set up trainer
+    trainer = Trainer(
+        model=model,
+        device=device,
+        save_dir="quickdraw_autoencoder",
+    )
 
-    # # Set up loss function and optimizer
-    # criterion = nn.CrossEntropyLoss()
-    # optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+    # Set up loss function and optimizer
+    criterion = nn.MSELoss()
+    optimizer = optim.SGD(
+        model.parameters(),
+        lr=args.lr,
+        momentum=args.momentum,
+    )
 
-    # # Train the model
-    # print("Training model...")
-    # history = trainer.train(
-    #     train_loader,
-    #     val_loader,
-    #     criterion,
-    #     optimizer,
-    #     num_epochs=args.epochs,
-    #     patience=args.patience,
-    #     verbose=True,
-    # )
+    # Train the model
+    print("Training model...")
+    history = trainer.train(
+        train_loader=train_loader,
+        val_loader=val_loader,
+        criterion=criterion,
+        optimizer=optimizer,
+        num_epochs=args.epochs,
+        patience=args.patience,
+        verbose=True,
+    )
 
     # # Evaluate on test set
     # print("Evaluating on test set...")
@@ -172,87 +179,18 @@ def main():
     #     if isinstance(value, (float, int, np.number)):
     #         print(f"{name}: {value:.4f}")
 
-    # # Plot and save training history
-    # fig, _ = plot_training_history(history)
-    # history_path = os.path.join(save_dir, "training_history.png")
-    # fig.savefig(history_path)
-    # print(f"Training history saved to {history_path}")
+    # Plot and save training history
+    fig, _ = plot_training_history(history)
+    history_path = os.path.join(save_dir, "training_history.png")
+    fig.savefig(history_path)
+    print(f"Training history saved to {history_path}")
 
-    # # Plot and save ROC and PR curves
-    # plot_roc_pr_curves(metrics, save_dir)
+    # Save model
+    model_path = os.path.join(save_dir, "model.pth")
+    torch.save(model.state_dict(), model_path)
+    print(f"Model saved to {model_path}")
 
-    # # Save model
-    # model_path = os.path.join(save_dir, "model.pth")
-    # torch.save(model.state_dict(), model_path)
-    # print(f"Model saved to {model_path}")
-
-    # # Save metrics
-    # metrics_path = os.path.join(save_dir, "metrics.txt")
-    # with open(metrics_path, "w") as f:
-    #     f.write("Test Metrics:\n")
-    #     for name, value in metrics.items():
-    #         if isinstance(value, (float, int, np.number)):
-    #             f.write(f"{name}: {value:.4f}\n")
-
-    #     f.write("\nModel Architecture:\n")
-    #     f.write(str(model))
-
-    #     f.write("\nTraining Parameters:\n")
-    #     for arg, value in vars(args).items():
-    #         f.write(f"{arg}: {value}\n")
-
-    # print(f"Metrics saved to {metrics_path}")
-
-    # # Plot a sample of test images with predictions
-    # print("Generating sample predictions...")
-    # plot_sample_predictions(test_loader, model, device, save_dir)
-
-    # print("Done!")
-
-
-# def plot_sample_predictions(test_loader, model, device, save_dir, num_samples=5):
-#     """Plot a sample of test images with predictions."""
-#     # Get a batch of images
-#     images, labels = next(iter(test_loader))
-
-#     # Select a subset of images
-#     images = images[:num_samples]
-#     labels = labels[:num_samples]
-
-#     # Get predictions
-#     model.eval()
-#     with torch.no_grad():
-#         outputs = model(images.to(device))
-#         probs = torch.softmax(outputs, dim=1)
-#         _, preds = torch.max(outputs, 1)
-
-#     # Convert tensors to numpy arrays
-#     images = images.cpu().numpy()
-#     labels = labels.cpu().numpy()
-#     preds = preds.cpu().numpy()
-#     probs = probs.cpu().numpy()
-
-#     # Plot images
-#     fig, axes = plt.subplots(1, num_samples, figsize=(15, 3))
-#     for i in range(num_samples):
-#         # Reshape the image
-#         img = images[i].reshape(28, 28)
-
-#         # Plot the image
-#         axes[i].imshow(img, cmap="gray")
-#         axes[i].set_title(
-#             f"True: {labels[i]}\nPred: {preds[i]}\nProb: {probs[i][preds[i]]:.2f}"
-#         )
-#         axes[i].axis("off")
-
-#     plt.tight_layout()
-
-#     # Save the plot
-#     plot_path = os.path.join(save_dir, "sample_predictions.png")
-#     plt.savefig(plot_path)
-#     plt.close()
-
-#     print(f"Sample predictions saved to {plot_path}")
+    print("Done!")
 
 
 if __name__ == "__main__":
