@@ -1,6 +1,7 @@
 import torch.nn as nn
 
 
+# TODO: BiGRUAutoencoder
 class GRUAutoencoder(nn.Module):
     def __init__(self, input_size=28, hidden_dim=128, num_layers=1):
         super().__init__()
@@ -34,7 +35,9 @@ class GRUAutoencoder(nn.Module):
 
         # Prepare decoder input (learned from hidden state)
         latent = hidden[-1].unsqueeze(0)  # Use last layer's hidden state
-        decoder_input = latent.repeat(seq_len, 1, 1).permute(1, 0, 2)
+        decoder_input = latent.repeat(seq_len, 1, 1).permute(
+            1, 0, 2
+        )  # "dummy" seq: each seq is same latent
 
         # Decode: Reconstruct sequence
         decoder_output, _ = self.decoder(decoder_input, hidden)
