@@ -72,14 +72,14 @@ def plot_roc_pr_curves(metrics, save_dir):
     print(f"Precision-Recall curves saved to {pr_path}")
 
 
-def plot_training_history(history):
+def plot_training_history(history, title_override=None):
     """Plot training history."""
-    fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+    fig, ax = plt.subplots(figsize=(6, 4))
 
     # Plot loss
     ax[0].plot(history["train_loss"], label="Train")
     ax[0].plot(history["val_loss"], label="Validation")
-    ax[0].set_title("Loss")
+    ax[0].set_title("Loss" if title_override is None else title_override)
     ax[0].set_xlabel("Epoch")
     ax[0].set_ylabel("Loss")
     ax[0].legend()

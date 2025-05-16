@@ -5,7 +5,6 @@ from datetime import datetime
 
 
 import numpy as np
-import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -59,6 +58,7 @@ def parse_args():
         help="Fraction of training data to use for validation",
     )
 
+    # Architecture parameters
     parser.add_argument(
         "--hidden_dim",
         type=int,
@@ -159,6 +159,18 @@ def main():
 
     # Train the model
     print("Training model...")
+    print(f"Training on {len(train_loader.dataset)} samples")
+    print(f"Validating on {len(val_loader.dataset)} samples")
+    print(f"Testing on {len(test_loader.dataset)} samples")
+    print(f"Using batch size: {args.batch_size}")
+    print(f"Using learning rate: {args.lr}")
+    print(f"Using momentum: {args.momentum}")
+    print(f"Using patience: {args.patience}")
+    print(f"Using epochs: {args.epochs}")
+    print(f"Using hidden dimension: {args.hidden_dim}")
+    print(f"Using number of layers: {args.num_layers}")
+    print(f"Using seed: {args.seed}")
+
     history = trainer.train(
         train_loader=train_loader,
         val_loader=val_loader,
@@ -169,18 +181,8 @@ def main():
         verbose=True,
     )
 
-    # # Evaluate on test set
-    # print("Evaluating on test set...")
-    # metrics = trainer.evaluate_metrics(test_loader)
-
-    # # Print metrics
-    # print("\nTest Metrics:")
-    # for name, value in metrics.items():
-    #     if isinstance(value, (float, int, np.number)):
-    #         print(f"{name}: {value:.4f}")
-
     # Plot and save training history
-    fig, _ = plot_training_history(history)
+    fig, _ = plot_training_history(history, title_override="MSE Loss over Epochs")
     history_path = os.path.join(save_dir, "training_history.png")
     fig.savefig(history_path)
     print(f"Training history saved to {history_path}")
