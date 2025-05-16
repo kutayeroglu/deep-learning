@@ -77,12 +77,12 @@ def plot_training_history(history, title_override=None):
     fig, ax = plt.subplots(figsize=(6, 4))
 
     # Plot loss
-    ax[0].plot(history["train_loss"], label="Train")
-    ax[0].plot(history["val_loss"], label="Validation")
-    ax[0].set_title("Loss" if title_override is None else title_override)
-    ax[0].set_xlabel("Epoch")
-    ax[0].set_ylabel("Loss")
-    ax[0].legend()
+    ax.plot(history["train_loss"], label="Train")
+    ax.plot(history["val_loss"], label="Validation")
+    ax.set_title("Loss" if title_override is None else title_override)
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel("Loss")
+    ax.legend()
 
     plt.tight_layout()
     return fig, ax
