@@ -84,13 +84,5 @@ def plot_training_history(history):
     ax[0].set_ylabel("Loss")
     ax[0].legend()
 
-    # Plot accuracy
-    ax[1].plot(history["train_acc"], label="Train")
-    ax[1].plot(history["val_acc"], label="Validation")
-    ax[1].set_title("Accuracy")
-    ax[1].set_xlabel("Epoch")
-    ax[1].set_ylabel("Accuracy")
-    ax[1].legend()
-
     plt.tight_layout()
     return fig, ax
