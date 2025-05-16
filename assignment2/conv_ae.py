@@ -36,7 +36,6 @@ def parse_args():
 
     # Training parameters
     parser.add_argument("--lr", type=float, default=0.001)
-    parser.add_argument("--momentum", type=float, default=0.9)
     parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--patience", type=int, default=5)
 
@@ -81,13 +80,14 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     # Training info
-    print("\nTraining configuration:")
-    print(f"Training samples: {len(train_loader.dataset)}")
-    print(f"Validation samples: {len(val_loader.dataset)}")
+    # Train the model
+    print("Training model...")
+    print(f"Training on {len(train_loader.dataset)} samples")
+    print(f"Validating on {len(val_loader.dataset)} samples")
     print(f"Batch size: {args.batch_size}")
     print(f"Learning rate: {args.lr}")
+    print(f"Patience: {args.patience}")
     print(f"Epochs: {args.epochs}")
-    print(f"Device: {device}\n")
 
     # Train model
     history = trainer.train(
