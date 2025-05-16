@@ -27,6 +27,9 @@ def plot_2d_embeddings(embeddings_2d, labels, title_override=None, save_path=Non
         title_override (str, optional): Custom title for the plot
         save_path (str, optional): Path to save the figure. If None, shows interactively.
     """
+    # Ensure labels are integers for discrete color mapping
+    labels = labels.astype(int)
+
     plt.figure(figsize=(10, 8))
     scatter = plt.scatter(
         embeddings_2d[:, 0],
