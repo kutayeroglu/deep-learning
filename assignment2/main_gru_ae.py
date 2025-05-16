@@ -8,6 +8,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from sklearn.manifold import TSNE
 
 # Get the absolute path of the script's directory
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -28,7 +29,9 @@ from models.gru_autoencoder import GRUAutoencoder
 from training.train import Trainer
 from utils.visualization import (
     plot_training_history,
+    plot_2d_embeddings,
 )
+from utils.helpers import extract_embeddings
 
 
 def parse_args():
@@ -190,7 +193,19 @@ def main():
     torch.save(model.state_dict(), model_path)
     print(f"Model saved to {model_path}")
 
-    print("Done!")
+    # Extract embeddings
+    print("\nExtracting embeddings...")
+    embeddings, labels = extract_embeddings(model, test_loader, device)
+
+    # Plot t-SNE
+    tsne = TSNE(n_components=2, random_state=42)
+    tsne_results = tsne.fit_transform(embeddings)
+    plot_2d_embeddings(
+        embeddings_2d=tsne_results,
+        labels=labels,
+        title_override="GRU Autoencoder",
+        save_path=os.path.join(save_dir, "gru_tsne.png"),
+    )
 
 
 if __name__ == "__main__":

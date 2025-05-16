@@ -7,6 +7,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from sklearn.manifold import TSNE
+
 
 # Get the absolute path of the script's directory
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -16,7 +18,11 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 from data.data_loader import load_quickdraw_data
 from models.conv_autoencoder import ConvAutoencoder
 from training.train import Trainer
-from utils.visualization import plot_training_history
+from utils.visualization import (
+    plot_training_history,
+    plot_2d_embeddings,
+)
+from utils.helpers import extract_embeddings
 
 
 def parse_args():
@@ -100,11 +106,30 @@ def main():
         verbose=True,
     )
 
-    # Save results
+    # Plot and save training history
     fig, _ = plot_training_history(history, title_override="CNN-AE MSE Loss")
-    fig.savefig(os.path.join(save_dir, "training_history.png"))
-    torch.save(model.state_dict(), os.path.join(save_dir, "model.pth"))
-    print("\nTraining completed and results saved!")
+    history_path = os.path.join(save_dir, "training_history.png")
+    fig.savefig(history_path)
+    print(f"Training history saved to {history_path}")
+
+    # Save model
+    model_path = os.path.join(save_dir, "model.pth")
+    torch.save(model.state_dict(), model_path)
+    print(f"Model saved to {model_path}")
+
+    # Extract embeddings
+    print("Extracting embeddings...")
+    embeddings, labels = extract_embeddings(model, test_loader, device)
+
+    # Plot t-SNE
+    tsne = TSNE(n_components=2, random_state=42)
+    tsne_results = tsne.fit_transform(embeddings)
+    plot_2d_embeddings(
+        embeddings_2d=tsne_results,
+        labels=labels,
+        title_override="CNN Autoencoder",
+        save_path=os.path.join(save_dir, "cnn_tsne.png"),
+    )
 
 
 if __name__ == "__main__":
