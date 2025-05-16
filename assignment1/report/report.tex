@@ -1,0 +1,158 @@
+\documentclass[10pt,a4paper,twoside]{article}
+\usepackage[english]{babel}
+%laad de pakketten nodig om wiskunde weer te geven :
+\usepackage{amsmath,amssymb,amsfonts,textcomp}
+%laad de pakketten voor figuren :
+\usepackage{graphicx}
+\usepackage{float,flafter}
+\usepackage{hyperref}
+\usepackage{inputenc}
+%zet de bladspiegel :
+\setlength\paperwidth{20.999cm}\setlength\paperheight{29.699cm}\setlength\voffset{-1in}\setlength\hoffset{-1in}\setlength\topmargin{1.499cm}\setlength\headheight{12pt}\setlength\headsep{0cm}\setlength\footskip{1.131cm}\setlength\textheight{25cm}\setlength\oddsidemargin{2.499cm}\setlength\textwidth{15.999cm}
+
+\begin{document}
+\begin{center}
+\hrule
+
+\vspace{.4cm}
+{\bf {\Huge CMPE 597 Sp. Tp. Deep Learning Spring 2025 Assignment 1}}
+\vspace{.2cm}
+\end{center}
+{\bf Kutay Eroğlu}, 2024700051 (kutay.eroglu@std.bogazici.edu.tr)  \hspace{\fill} Group {\bf 12} \\
+{\bf Mücahit Erdoğan Ünlü}, 2021400171 (mucahit.unlu@std.bogazici.edu.tr) \hspace{\fill} 13 April 2025 \\
+\hrule
+
+\section{Overview}
+Throughout this report, classification using cross-entropy will be referred to as Task 1, and classification using word embeddings as Task 2. All plots and metrics related to Task 1 are from NumPy-based implementation, unless stated otherwise.
+To establish a reliable baseline, Task 1.2 — Implementation with Deep Learning Libraries — was addressed first. The full implementation is available at the following \href{https://github.com/kutayeroglu/deep-learning}{GitHub repository} and \href{https://drive.google.com/file/d/1zl6N5mgoxoI37qVwYcb3n37ssTL8Q76D/view?usp=sharing}{Google Drive Link}
+
+
+\section{Classification with Cross-Entropy}
+\subparagraph{Depth \& Width of the Network and Activation Functions}
+The network architecture was chosen considering the simplicity and dimensionality of the Quick Draw dataset, comprising small images (28×28) and five distinct categories. Two hidden layers were selected to sufficiently capture necessary feature hierarchies without overfitting. The number of neurons in these layers (128 and 64) were chosen based on common heuristics and typical values used for similar image-classification tasks. The Rectified Linear Unit (ReLU) activation function was used due to its computational efficiency, simplicity, and effectiveness in addressing vanishing gradients.
+\subparagraph{Momentum Value for Stochastic Gradient Descent with Momentum}
+Momentum was set to the suggested value of 0.9. Since the model achieved satisfactory performance, this hyperparameter was not further adjusted.
+\subparagraph{Performance Metrics on Test Set}
+Evaluation metrics on test set are presented in Figure~\ref{fig:task1_metrics}; precision-recall curve in Figure~\ref{fig:task1_pr}; roc curve in Figure~\ref{fig:task1_roc}
+For precision, the weighted averaging method was used to provide a more reliable assessment in the presence of class imbalance.
+Therefore, the accuracy score is equal to the recall, as defined in \cite{sklearn_recall}. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{task1-1_metrics.png} 
+    \caption{Evaluation metrics on test set for Task 1}
+    \label{fig:task1_metrics}
+\end{figure}
+
+The test metrics, shown in Figure~\ref{fig:task1_metrics}, indicate strong overall performance. The model achieves an accuracy of 83.22\%, with balanced precision (83.59\%) and recall (83.22\%), suggesting consistent classification across categories. Additionally, the high ROC AUC of 0.9684 and PR AUC of 0.9114 highlight the model’s ability to discriminate between classes and maintain reliable precision-recall trade-offs.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{task1-1_pr_curve.png} 
+    \caption{Precision-recall curve on test set for Task 1}
+    \label{fig:task1_pr}
+\end{figure}
+
+Figure~\ref{fig:task1_pr} presents the precision-recall curves for each class, with an average AUC of 0.911. While most classes (2, 3, and 4) achieve very high AUC values above 0.94, Class 1 notably lags behind with an AUC of 0.820, indicating that the model struggles more with that category. Class 0 performs reasonably well with an AUC of 0.895. Overall, the curves show strong precision across high recall ranges, suggesting reliable performance, though the variation between classes highlights potential room for improvement in class-specific representation or balance.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{task1-1_roc_curves.png} 
+    \caption{ROC curve on test set for Task 1}
+    \label{fig:task1_roc}
+\end{figure}
+
+Figure~\ref{fig:tas_roc} displays the ROC curves for each class, with an impressive average AUC of 0.968. All classes show strong separability, with Classes 3 and 4 achieving the highest AUC scores of 0.981. Even the lowest-performing class (Class 1) maintains a solid AUC of 0.936, indicating reliable discrimination between true and false positives across all categories. The tight clustering of most curves near the top-left corner highlights the model’s overall effectiveness in distinguishing between classes, reinforcing its strong classification capability
+
+\subparagraph{Loss and Accuracy Plots for Training \& Validation}
+Figure~\ref{fig:task1_training} shows training and validation loss and accuracy over epochs. Training loss decreases steadily, indicating effective learning, while validation loss plateaus and slightly increases toward the end, suggesting early signs of overfitting. Similarly, training accuracy improves consistently, whereas validation accuracy fluctuates and slightly declines after epoch 8. This indicates limited generalization and potential for improvement through regularization.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{task1-1_training_history.png} 
+    \caption{Loss and Accuracy Plots for Task 1}
+    \label{fig:task1_training}
+\end{figure}
+
+\subparagraph{Choice of Hyperparameters}
+Reasoning behind the depth and width of the network (hidden\_dims in Figure~\ref{fig:task1_hparams}) is discussed in Section 1.a; momentum in 1.b.
+
+\begin{itemize}
+    \item \textbf{Batch Size:} A batch size of 64 is a common choice that offers a good trade-off between computational efficiency and the stability of gradient estimates. It helps maintain the stochastic nature of gradient descent, which can help in escaping local minima.
+
+    \item \textbf{Validation Split:} Reserving 10\% of the dataset for validation provides a sufficient subset to monitor the model's performance on unseen data during training. This helps in detecting overfitting and in making decisions about early stopping.
+
+    \item \textbf{Learning Rate:} A learning rate of 0.01 is a standard starting point that allows for reasonably fast convergence without overshooting minima.
+
+    \item \textbf{Epochs and Patience:} Setting the maximum number of epochs to 20, with an early stopping patience of 5, helps prevent overfitting. If the validation performance does not improve for 5 consecutive epochs, training stops early, saving computational resources and avoiding degradation in performance on unseen data.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{task1-1_hparams.png} 
+    \caption{Hyperparameters for Task 1}
+    \label{fig:task1_hparams}
+\end{figure}
+
+\subparagraph{Implementation with Deep Learning Libraries} As specified in the assignment description, the model was trained using the same optimizer and hyperparameters as in Task 1. Compared to the NumPy implementation, the validation loss exhibits a more consistent and noticeable decrease. Similarly, validation accuracy increases more steadily. Both trends are illustrated in Figure~\ref{fig:task1_torch_train}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{task1-1_torch_training.jpeg} 
+    \caption{Loss and Accuracy Plots for Task 1: PyTorch Implementation}
+    \label{fig:task1_torch_train}
+\end{figure}
+
+Regarding the evaluation metrics, the PyTorch implementation demonstrates a slight advantage over the NumPy version, as shown in Figure~\ref{fig:task1_torch_metrics}. However, the difference is minimal.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{task1-1_torch_metrics.jpeg} 
+    \caption{Evaluation metrics on test set for Task 1: PyTorch Implementation}
+    \label{fig:task1_torch_metrics}
+\end{figure}
+
+\section{Classification with Word Embeddings}
+\subparagraph{Evaluation Metrics}
+The performance of the model in Task 2, which employs embedding-based classification instead of cross-entropy loss, is summarized in Figure~\ref{fig:task2_torch_metrics} and Figure~\ref{fig:task2_torch_training}. The reported test metrics indicate a strong performance: the model achieves an accuracy of 84.42\%, precision of 84.33\%, and recall of 84.42\%. Additionally, the high ROC AUC score of 0.9562 and PR AUC of 0.9050 suggest that the model is effective at distinguishing between the five classes.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{task2-metrics.jpeg} 
+    \caption{Evaluation metrics on test set for Task 2: PyTorch Implementation}
+    \label{fig:task2_torch_metrics}
+\end{figure}
+
+
+\subparagraph{Loss and Accuracy Plots}
+In the training curves (Figure~\ref{fig:task2_torch_training}), the training loss steadily decreases, suggesting consistent learning throughout the epochs. However, the validation loss and accuracy display noticeable fluctuations, indicating some instability in generalization across epochs. These "zig-zag" patterns suggest that while the model learns useful representations, it may be sensitive to the validation subset or require additional regularization to stabilize performance. Despite this, the overall trend in validation accuracy is positive, and the final performance metrics confirm the effectiveness of the shared embedding space in handling classification via similarity ranking.
+
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{task2-training.jpeg} 
+    \caption{Loss and Accuracy Plots for Task 2: PyTorch Implementation}
+    \label{fig:task2_torch_training}
+\end{figure}
+
+
+\section{How to Run the Code}
+
+\begin{enumerate}
+    \item Clone the source code from the GitHub repository linked in Section~1.
+    \item Create a conda environment using the provided \texttt{environment.yml} file.
+    \item Download and place the Quick Draw dataset inside the \texttt{data} directory.
+    \item Run \texttt{main.py} for the NumPy-based implementation, or \texttt{torch\_main.py} for the PyTorch-based implementation.
+\end{enumerate}
+
+
+\begin{thebibliography}{9}
+
+\bibitem{sklearn_recall}
+Scikit-learn. \textit{sklearn.metrics.recall\_score}.  
+Available at: \url{https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html}.  
+Accessed: April 13, 2025.
+\end{thebibliography}
+
+\end{document}
