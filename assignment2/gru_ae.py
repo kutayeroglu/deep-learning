@@ -161,15 +161,13 @@ def main():
     print("Training model...")
     print(f"Training on {len(train_loader.dataset)} samples")
     print(f"Validating on {len(val_loader.dataset)} samples")
-    print(f"Testing on {len(test_loader.dataset)} samples")
-    print(f"Using batch size: {args.batch_size}")
-    print(f"Using learning rate: {args.lr}")
-    print(f"Using momentum: {args.momentum}")
-    print(f"Using patience: {args.patience}")
-    print(f"Using epochs: {args.epochs}")
-    print(f"Using hidden dimension: {args.hidden_dim}")
-    print(f"Using number of layers: {args.num_layers}")
-    print(f"Using seed: {args.seed}")
+    print(f"Batch size: {args.batch_size}")
+    print(f"Learning rate: {args.lr}")
+    print(f"Momentum: {args.momentum}")
+    print(f"Patience: {args.patience}")
+    print(f"Epochs: {args.epochs}")
+    print(f"Hidden dimension: {args.hidden_dim}")
+    print(f"Number of layers: {args.num_layers}")
 
     history = trainer.train(
         train_loader=train_loader,
@@ -182,7 +180,7 @@ def main():
     )
 
     # Plot and save training history
-    fig, _ = plot_training_history(history, title_override="MSE Loss over Epochs")
+    fig, _ = plot_training_history(history, title_override="GRU-AE MSE Loss")
     history_path = os.path.join(save_dir, "training_history.png")
     fig.savefig(history_path)
     print(f"Training history saved to {history_path}")
