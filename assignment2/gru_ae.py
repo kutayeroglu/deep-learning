@@ -182,7 +182,7 @@ def main():
     )
 
     # Plot and save training history
-    fig, _ = plot_training_history(history, title_override="MSE Loss over Epochs")
+    fig, _ = plot_training_history(history, title_override="GRU-AE MSE Loss")
     history_path = os.path.join(save_dir, "training_history.png")
     fig.savefig(history_path)
     print(f"Training history saved to {history_path}")
