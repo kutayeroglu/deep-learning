@@ -38,3 +38,8 @@ class ConvAutoencoder(nn.Module):
         x = self.encoder(x)
         x = self.decoder(x)
         return x.squeeze(1)  # Remove channel dim to match original input shape
+
+    def encode(self, x):
+        # Return flattened encoder output
+        x = self.encoder(x)
+        return x.view(x.size(0), -1)  # Flatten to (batch_size, latent_dim)

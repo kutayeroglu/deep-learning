@@ -44,3 +44,8 @@ class GRUAutoencoder(nn.Module):
         reconstructed = self.fc(decoder_output)
 
         return reconstructed
+
+    def encode(self, x):
+        # Extract the encoder's final hidden state
+        _, hidden = self.encoder(x)  # hidden: (num_layers, batch_size, hidden_dim)
+        return hidden[-1]  # Return last layer's hidden state (batch_size, hidden_dim)
